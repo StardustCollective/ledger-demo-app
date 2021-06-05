@@ -1,7 +1,7 @@
 
 
-    const hostname = 'http://lb.constellationnetwork.io';
-    const port = '9000';
+const hostname = 'https://www.stargazer.network/api/node';
+
 
 class Api{
 
@@ -15,7 +15,7 @@ class Api{
 
   public static async get(endPoint: string, body?: any){
 
-    let url = `${hostname}:${port}${endPoint}`;
+    let url = `${hostname}${endPoint}`;
     let init = {
       method: 'GET',
       body: null,
