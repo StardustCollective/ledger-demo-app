@@ -71,7 +71,7 @@ function ConnectView() {
     <CardContent>
       <CardActions>
         <BlueButton onClick={onConnectClick} className={"connectButton"} size="large" variant="contained" color="primary">
-          <LockOpen />&nbsp;Unlock with Ledger
+          <LockOpen />&nbsp;Unlock with Ledgers
         </BlueButton>
       </CardActions>
     </CardContent>
