@@ -1,5 +1,4 @@
-
-
+import getStream from 'get-stream';
 const hostname = 'https://www.stargazer.network/api/node';
 
 
@@ -29,12 +28,13 @@ class Api{
       init.body = body;
     }
     try {
-      return await fetch(url, init);
+      const response = await fetch(url, init);
+      if(response.status === 200){
+        return response.json();
+      }
     } catch (error){
       throw new Error(error);
     }
-
-
   }
 
 }

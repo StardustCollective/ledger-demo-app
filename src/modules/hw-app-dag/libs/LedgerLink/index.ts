@@ -15,13 +15,13 @@ const DEVICE_ID = '8004000000';
 
 const ACCOUNTS = [
   '80000000',
-  // '70000000',
-  // '60000000',
-  // '50000000',
-  // '40000000',
-  // '30000000',
-  // '20000000',
-  // '10000000',
+  '70000000',
+  '60000000',
+  '50000000',
+  '40000000',
+  '30000000',
+  '20000000',
+  '10000000',
 ];
 
 ////////////////////
@@ -73,10 +73,7 @@ class LedgerLink {
       }));
       return;
     }
-    console.log("before calling list");
     this.transport.list().then((paths: Array<String>) => {
-      console.log("List response");
-      console.log(paths);
       if (paths.length === 0) {
         deviceErrorCallback(this.finishLedgerDeviceInfo({
           enabled: false,
@@ -85,14 +82,9 @@ class LedgerLink {
         }));
       } else {
         const path = paths[0];
-        // console.log('path',path);
         this.transport.open(path).then((device: any) => {
-          console.log(device);
-          // console.trace('deviceThenCallback', deviceThenCallback, device);
           deviceThenCallback(device);
         }, (error: Error) => {
-          console.log("Device Error: " );
-          console.log(error);
           deviceErrorCallback(error);
         });
       }
@@ -108,16 +100,8 @@ class LedgerLink {
   private sendExchangeMessage = (bip44Path: String, device: any) => {
     return  new Promise((resolve, reject) => {
       const message = Buffer.from(DEVICE_ID + bip44Path, 'hex');
-      /* istanbul ignore if */
-      if (debug) {
-        console.log('exchange', 'message', message.toString('hex').toUpperCase());
-      }
       device.exchange(message).then((response: any) => {
         const responseStr = response.toString('hex').toUpperCase();
-        /* istanbul ignore if */
-        if (debug) {
-          console.log('exchange', 'response', responseStr);
-        }
         let success = false;
         let message = '';
         let publicKey = '';
@@ -150,8 +134,7 @@ class LedgerLink {
   // Public Methods
   ///////////////////////
 
-  public getPublicKeysForAllAccounts = (callback: Function) => {
-    console.log('Called get public keys');
+  public getPublicKeysForAllAccounts = (callback: Function, progressUpdateCallback?: Function) => {
     if(!this.transport){
       throw new Error('Error: A transport must be set via the constructor before calling this method');
     }
@@ -163,6 +146,9 @@ class LedgerLink {
           const bip44Path = this.createBipPathFromAccount(ACCOUNTS[i]);
           const result = await this.sendExchangeMessage(bip44Path, device)
           promiseArray.push(result);
+          if(progressUpdateCallback) {
+            progressUpdateCallback((i + 1)/ACCOUNTS.length)
+          }
         }
         device.close();
         callback(await Promise.all(promiseArray));
