@@ -26,6 +26,7 @@ import './App.css';
 
 const ALERT_MESSAGES = {
   CONNECTION_CANCELED: 'Connection Canceled: Please connect to unlock wallet with Ledger.',
+  OPEN_CONSTELLATION_APP: 'Open App: Please open the Constellation App on your Ledger',
 }
 
 const ALERT_SEVERITY = {
@@ -116,28 +117,34 @@ function App() {
   }
 
   const onConnectClick = async () => {
-
+    let transport;
     try {
+      // Close any open alerts
+      setOpenAlert(false);
+      // Update the wallet state
       setWalletState(WALLET_STATE_ENUM.FETCHING);
-
-      let transport = await webHidTransport.request();
+      // Prompt for USB permissions
+      transport = await webHidTransport.request();
       // Close any existing connections
       transport.close()
 
       dag = new Dag(webHidTransport);
 
-      // Get account data 
+      // Get account data for ledger
       const accountData = await dag.getAccounts(onProgressUpdate) as Array<DAG_ACCOUNT>;
       setAccountData(accountData);
       setWalletState(WALLET_STATE_ENUM.VIEW_ACCOUNTS);
 
-    } catch (error) {
-      // console.log(typeof error.message);
-      if (error.message.includes('open')) {
+    } catch (error) {;
+      if (error.message.includes('Cannot read property')) {
         setAlertSeverity(ALERT_SEVERITY.ERROR);
         setAlertMessage(ALERT_MESSAGES.CONNECTION_CANCELED);
         setOpenAlert(true);
-      }
+      } else if (error.message.includes('6E01')){
+        setAlertSeverity(ALERT_SEVERITY.ERROR);
+        setAlertMessage(ALERT_MESSAGES.OPEN_CONSTELLATION_APP);
+        setOpenAlert(true);
+      } 
       setWalletState(WALLET_STATE_ENUM.LOCKED);
     }
 

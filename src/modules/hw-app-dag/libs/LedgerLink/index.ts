@@ -110,8 +110,9 @@ class LedgerLink {
           message = responseStr;
           publicKey = responseStr.substring(0, 130);
         } else {
-          if (responseStr == '6E00') {
-            message = '6E00 App Not Open On Ledger Device';
+          if (responseStr == '6E01') {
+            message = '6E01 App Not Open On Ledger Device';
+            throw new Error(message);
           } else {
             message = responseStr + ' Unknown Error';
           }
@@ -122,7 +123,7 @@ class LedgerLink {
           publicKey: publicKey,
         });
       }).catch((error: Error) => {
-        resolve({
+        reject({
           success: false,
           message: error.message,
         });
