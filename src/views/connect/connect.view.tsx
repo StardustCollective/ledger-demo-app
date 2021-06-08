@@ -23,7 +23,7 @@ import LockOpen from '@material-ui/icons/LockOpen';
 // Styles Imports
 /////////////////////////
 
-import styles from './connect.module.scss';
+import styles from './styles.module.scss';
 
 /////////////////////////
 // Constants
