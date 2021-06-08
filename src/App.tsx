@@ -4,13 +4,6 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
 import Dag from './modules/hw-app-dag';
 import logo from './logo.png';
@@ -22,6 +15,13 @@ import './App.css';
 
 import ConnectView from './views/connect';
 import FetchingProgressView from './views/fetchingProgress';
+import AccountsView from './views/accounts';
+
+/////////////////////////
+// Interface Imports
+/////////////////////////
+
+import { DAG_ACCOUNT } from './interfaces';
 
 /////////////////////////
 // Constants
@@ -30,11 +30,12 @@ import FetchingProgressView from './views/fetchingProgress';
 // Strings
 const CONNECTION_CANCELED_ERROR_STRING = 'Cannot read property';
 const LEDGER_APP_CLOSED_ERROR_STRING = '6E01';
-const ALERT_MESSAGES = {
+const ALERT_MESSAGES_STRINGS = {
   CONNECTION_CANCELED: 'Connection Canceled: Please connect to unlock wallet with Ledger.',
   OPEN_CONSTELLATION_APP: 'Open App: Please open the Constellation App on your Ledger',
 }
-const ALERT_SEVERITY = {
+// States
+const ALERT_SEVERITY_STATE = {
   SUCCESS: 'success',
   ERROR: 'error',
   WARNING: 'warning',
@@ -56,34 +57,21 @@ enum WALLET_STATE_ENUM {
 /////////////////////////
 // Interfaces
 /////////////////////////
-interface DAG_ACCOUNT {
-  address: String,
-  balance: Number,
+
+interface IRenderStateProp  {
+  walletState: WALLET_STATE_ENUM;
 }
+
+
+/////////////////////////
+// Style Hooks
+/////////////////////////
 
 const useStyles = makeStyles({
   root: {
     minWidth: 400,
   },
-  content: {
-    padding: 0,
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-  table: {
-    minWidth: 650,
-  },
 });
-
 
 function Header() {
   return (
@@ -103,7 +91,6 @@ function Alert(props: AlertProps) {
 }
 
 function App() {
-
 
   let dag;
 
@@ -139,10 +126,8 @@ function App() {
       transport = await webHidTransport.request();
       // Close any existing connections
       transport.close()
-
       // Set the transport 
       dag = new Dag(webHidTransport);
-
       // Get account data for ledger
       const accountData = await dag.getAccounts(onProgressUpdate) as Array<DAG_ACCOUNT>;
       setAccountData(accountData);
@@ -150,12 +135,12 @@ function App() {
 
     } catch (error) {;
       if (error.message.includes(CONNECTION_CANCELED_ERROR_STRING)) {
-        setAlertSeverity(ALERT_SEVERITY.ERROR);
-        setAlertMessage(ALERT_MESSAGES.CONNECTION_CANCELED);
+        setAlertSeverity(ALERT_SEVERITY_STATE.ERROR);
+        setAlertMessage(ALERT_MESSAGES_STRINGS.CONNECTION_CANCELED);
         setOpenAlert(true);
       } else if (error.message.includes(LEDGER_APP_CLOSED_ERROR_STRING)){
-        setAlertSeverity(ALERT_SEVERITY.ERROR);
-        setAlertMessage(ALERT_MESSAGES.OPEN_CONSTELLATION_APP);
+        setAlertSeverity(ALERT_SEVERITY_STATE.ERROR);
+        setAlertMessage(ALERT_MESSAGES_STRINGS.OPEN_CONSTELLATION_APP);
         setOpenAlert(true);
       } 
       setWalletState(WALLET_STATE_ENUM.LOCKED);
@@ -163,41 +148,6 @@ function App() {
 
   }
 
-
-
-  const AccountsView = () => {
-
-    return (
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Account</TableCell>
-              <TableCell align='left'>Address</TableCell>
-              <TableCell align="left">Balance</TableCell>
-              <TableCell align="left"></TableCell>
-              {/* <TableCell align="right">Protein&nbsp;(g)</TableCell> */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {accountData.map((item, itemKey) => (
-              <TableRow key={itemKey}>
-                <TableCell component="th" scope="row">
-                  {itemKey + 1}
-                </TableCell>
-                <TableCell align="left">{item.address}</TableCell>
-                <TableCell align="left">{item.balance}</TableCell>
-                <TableCell align="left">Generate Transaction</TableCell>
-                {/* <TableCell align="right">{row.protein}</TableCell> */}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-
-
-  }
 
   const AlertSnackBar = (props:{openAlert: boolean, message: String, severity: undefined}) => {
 
@@ -221,8 +171,7 @@ function App() {
   // Renders
   /////////////////////////
 
-  function RenderByWalletState(props: any) {
-
+  function RenderByWalletState(props: IRenderStateProp) {
     if (props.walletState === WALLET_STATE_ENUM.LOCKED) {
       return (
         <>
@@ -238,13 +187,11 @@ function App() {
     } else if (props.walletState === WALLET_STATE_ENUM.VIEW_ACCOUNTS) {
       return (
         <>
-          <AccountsView />
+          <AccountsView  accountData={accountData} />
         </>
       );
     }
-
     return null;
-
   }
 
 
