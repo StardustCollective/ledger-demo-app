@@ -101,6 +101,14 @@ function Alert(props: AlertProps) {
 function App() {
   const classes = useStyles();
 
+
+  let dag;
+
+  /////////////////////////
+  // Hooks
+  /////////////////////////
+
+  const classes = useStyles();
   const [walletState, setWalletState] = useState<WALLET_STATE_ENUM>(WALLET_STATE_ENUM.LOCKED);
   const [accountData, setAccountData] = useState<Array<DAG_ACCOUNT>>([]);
   const [openAlert, setOpenAlert] = useState<boolean>(false);
@@ -108,8 +116,10 @@ function App() {
   const [alertSeverity, setAlertSeverity] = useState<String>('');
   const [accountsLoadProgress, setAccountsLoadProgress] = useState<Number>(0);
   const bull = <span className={classes.bullet}>•</span>;
-  let dag;
-
+  
+  /////////////////////////
+  // Callbacks
+  /////////////////////////
 
   const onProgressUpdate = (loadProgress: number) => {
     let progress = loadProgress * 100;
@@ -149,6 +159,10 @@ function App() {
     }
 
   }
+  
+  /////////////////////////
+  // Views
+  /////////////////////////
 
   function ConnectView() {
     let dag: any;
@@ -244,6 +258,9 @@ function App() {
 
   }
 
+  /////////////////////////
+  // Renders
+  /////////////////////////
 
   function RenderByWalletState(props: any) {
 
