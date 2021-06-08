@@ -4,7 +4,6 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
-import Typography from '@material-ui/core/Typography';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -12,9 +11,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
-import Box from '@material-ui/core/Box';
 import Dag from './modules/hw-app-dag';
 import logo from './logo.png';
 import './App.css';
@@ -24,6 +21,7 @@ import './App.css';
 /////////////////////////
 
 import ConnectView from './views/connect';
+import FetchingProgressView from './views/fetchingProgress';
 
 /////////////////////////
 // Constants
@@ -119,7 +117,7 @@ function App() {
   const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<String>('');
   const [alertSeverity, setAlertSeverity] = useState<String>('');
-  const [accountsLoadProgress, setAccountsLoadProgress] = useState<Number>(0);
+  const [accountsLoadProgress, setAccountsLoadProgress] = useState<number>(0);
   const bull = <span className={classes.bullet}>•</span>;
   
   /////////////////////////
@@ -166,32 +164,7 @@ function App() {
 
   }
 
-  function FetchingView() {
 
-
-    function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
-      return (
-        <Box display='flex' alignItems='center'>
-          <Box width='83%' mr={1}>
-            <LinearProgress variant='determinate' {...props} />
-          </Box>
-          <Box minWidth={35}>
-            <Typography variant='body2' color='textSecondary'>{`${Math.round(
-              props.value,
-            )}%`}</Typography>
-          </Box>
-        </Box>
-      );
-    }
-
-    return (
-      <div className='fetchingView'>
-        <Typography>Loading Accounts...</Typography>
-        <LinearProgressWithLabel value={accountsLoadProgress} />
-      </div>
-    );
-
-  }
 
   const AccountsView = () => {
 
@@ -260,7 +233,7 @@ function App() {
     } else if (props.walletState === WALLET_STATE_ENUM.FETCHING) {
       return (
         <>
-          <FetchingView />
+          <FetchingProgressView accountsLoadProgress={accountsLoadProgress}/>
         </>
       );
     } else if (props.walletState === WALLET_STATE_ENUM.VIEW_ACCOUNTS) {

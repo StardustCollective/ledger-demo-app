@@ -36,14 +36,6 @@
   font-size: 22px;
 }
 
-.fetchingView {
-  width: 100%;
-  padding: 20px;
-  /* display: flex; */
-  justify-content: center;
-  align-items: center;
-}
-
 .fetchingView__cardContent {
   width: 100%
 }
