@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
-import { createMuiTheme, withStyles, makeStyles, ThemeProvider } from '@material-ui/core/styles'
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
-import LockOpen from '@material-ui/icons/LockOpen';
+import { makeStyles } from '@material-ui/core/styles'
+
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import Typography from '@material-ui/core/Typography';
@@ -15,26 +12,40 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import CircularProgress , { CircularProgressProps }from '@material-ui/core/CircularProgress';
 import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
 import Box from '@material-ui/core/Box';
-// import webUsbTransport from '@ledgerhq/hw-transport-webusb';
 import Dag from './modules/hw-app-dag';
 import logo from './logo.png';
 import './App.css';
 
+/////////////////////////
+// View Imports
+/////////////////////////
+
+import ConnectView from './views/connect';
+
+/////////////////////////
+// Constants
+/////////////////////////
+
+// Strings
+const CONNECTION_CANCELED_ERROR_STRING = 'Cannot read property';
+const LEDGER_APP_CLOSED_ERROR_STRING = '6E01';
 const ALERT_MESSAGES = {
   CONNECTION_CANCELED: 'Connection Canceled: Please connect to unlock wallet with Ledger.',
   OPEN_CONSTELLATION_APP: 'Open App: Please open the Constellation App on your Ledger',
 }
-
 const ALERT_SEVERITY = {
   SUCCESS: 'success',
   ERROR: 'error',
   WARNING: 'warning',
   INFO: 'info',
 }
+
+/////////////////////////
+// ENUMS
+/////////////////////////
 
 enum WALLET_STATE_ENUM {
   LOCKED = 1,
@@ -43,6 +54,10 @@ enum WALLET_STATE_ENUM {
   VIEW_ACCOUNT_ACTIVITY,
   SENDING,
 }
+
+/////////////////////////
+// Interfaces
+/////////////////////////
 interface DAG_ACCOUNT {
   address: String,
   balance: Number,
@@ -71,23 +86,14 @@ const useStyles = makeStyles({
   },
 });
 
-const BlueButton = withStyles((theme) => ({
-  root: {
-    color: theme.palette.getContrastText("#001a2e"),
-    backgroundColor: "#001a2e",
-    '&:hover': {
-      backgroundColor: "#001a2e",
-    },
-  },
-}))(Button);
 
 function Header() {
   return (
-    <div className="cardHeader">
-      <div className="leftHeader">
+    <div className='cardHeader'>
+      <div className='leftHeader'>
         <img src={logo} width={150} height={38} />
       </div>
-      <div className="rightHeader">
+      <div className='rightHeader'>
         Wallet
       </div>
     </div>
@@ -95,11 +101,10 @@ function Header() {
 }
 
 function Alert(props: AlertProps) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
+  return <MuiAlert elevation={6} variant='filled' {...props} />;
 }
 
 function App() {
-  const classes = useStyles();
 
 
   let dag;
@@ -138,6 +143,7 @@ function App() {
       // Close any existing connections
       transport.close()
 
+      // Set the transport 
       dag = new Dag(webHidTransport);
 
       // Get account data for ledger
@@ -146,11 +152,11 @@ function App() {
       setWalletState(WALLET_STATE_ENUM.VIEW_ACCOUNTS);
 
     } catch (error) {;
-      if (error.message.includes('Cannot read property')) {
+      if (error.message.includes(CONNECTION_CANCELED_ERROR_STRING)) {
         setAlertSeverity(ALERT_SEVERITY.ERROR);
         setAlertMessage(ALERT_MESSAGES.CONNECTION_CANCELED);
         setOpenAlert(true);
-      } else if (error.message.includes('6E01')){
+      } else if (error.message.includes(LEDGER_APP_CLOSED_ERROR_STRING)){
         setAlertSeverity(ALERT_SEVERITY.ERROR);
         setAlertMessage(ALERT_MESSAGES.OPEN_CONSTELLATION_APP);
         setOpenAlert(true);
@@ -159,37 +165,18 @@ function App() {
     }
 
   }
-  
-  /////////////////////////
-  // Views
-  /////////////////////////
-
-  function ConnectView() {
-    let dag: any;
-
-    return (
-      <CardContent>
-        <CardActions>
-          <BlueButton onClick={onConnectClick} className={"connectButton"} size="large" variant="contained" color="primary">
-            <LockOpen />&nbsp;Unlock with Ledgers
-          </BlueButton>
-        </CardActions>
-      </CardContent>
-    );
-  }
-
 
   function FetchingView() {
 
 
     function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
       return (
-        <Box display="flex" alignItems="center">
-          <Box width="83%" mr={1}>
-            <LinearProgress variant="determinate" {...props} />
+        <Box display='flex' alignItems='center'>
+          <Box width='83%' mr={1}>
+            <LinearProgress variant='determinate' {...props} />
           </Box>
           <Box minWidth={35}>
-            <Typography variant="body2" color="textSecondary">{`${Math.round(
+            <Typography variant='body2' color='textSecondary'>{`${Math.round(
               props.value,
             )}%`}</Typography>
           </Box>
@@ -198,7 +185,7 @@ function App() {
     }
 
     return (
-      <div className="fetchingView">
+      <div className='fetchingView'>
         <Typography>Loading Accounts...</Typography>
         <LinearProgressWithLabel value={accountsLoadProgress} />
       </div>
@@ -214,7 +201,7 @@ function App() {
           <TableHead>
             <TableRow>
               <TableCell>Account</TableCell>
-              <TableCell align="left">Address</TableCell>
+              <TableCell align='left'>Address</TableCell>
               <TableCell align="left">Balance</TableCell>
               <TableCell align="left"></TableCell>
               {/* <TableCell align="right">Protein&nbsp;(g)</TableCell> */}
@@ -228,7 +215,7 @@ function App() {
                 </TableCell>
                 <TableCell align="left">{item.address}</TableCell>
                 <TableCell align="left">{item.balance}</TableCell>
-                <TableCell align="left">View</TableCell>
+                <TableCell align="left">Generate Transaction</TableCell>
                 {/* <TableCell align="right">{row.protein}</TableCell> */}
               </TableRow>
             ))}
@@ -240,7 +227,7 @@ function App() {
 
   }
 
-  const AlertSnackBar = (props:{openAlert: boolean, message: String, severity: String}) => {
+  const AlertSnackBar = (props:{openAlert: boolean, message: String, severity: undefined}) => {
 
     const onClose = () => {
       setOpenAlert(false)
@@ -267,7 +254,7 @@ function App() {
     if (props.walletState === WALLET_STATE_ENUM.LOCKED) {
       return (
         <>
-          <ConnectView />
+          <ConnectView onConnectClick={onConnectClick} />
         </>
       );
     } else if (props.walletState === WALLET_STATE_ENUM.FETCHING) {
