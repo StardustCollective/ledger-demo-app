@@ -1,3 +1,7 @@
+/////////////////////////
+// Module Imports
+/////////////////////////
+
 import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
 import { makeStyles } from '@material-ui/core/styles'
@@ -57,11 +61,9 @@ enum WALLET_STATE_ENUM {
 /////////////////////////
 // Interfaces
 /////////////////////////
-
 interface IRenderStateProp  {
   walletState: WALLET_STATE_ENUM;
 }
-
 
 /////////////////////////
 // Style Hooks

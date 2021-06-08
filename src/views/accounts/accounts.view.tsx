@@ -16,9 +16,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
+/////////////////////////
+// Interface Imports
+/////////////////////////
 
 import { DAG_ACCOUNT } from '../../interfaces';
-
 
 /////////////////////////
 // Styles
@@ -33,9 +35,6 @@ const useStyles = makeStyles({
 /////////////////////////
 // Interfaces
 /////////////////////////
-
-
-
 interface IAccountsProps {
   accountData: Array<DAG_ACCOUNT>;
 }
