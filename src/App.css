@@ -36,11 +36,6 @@
   font-size: 22px;
 }
 
-.connectButton {
-  width: 450px;
-  background-color: rgba(0, 22, 66, 1);
-}
-
 .fetchingView {
   width: 100%;
   padding: 20px;
