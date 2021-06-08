@@ -118,7 +118,6 @@ function App() {
   const [alertMessage, setAlertMessage] = useState<String>('');
   const [alertSeverity, setAlertSeverity] = useState<String>('');
   const [accountsLoadProgress, setAccountsLoadProgress] = useState<number>(0);
-  const bull = <span className={classes.bullet}>•</span>;
   
   /////////////////////////
   // Callbacks
