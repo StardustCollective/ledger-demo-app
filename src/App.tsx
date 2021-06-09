@@ -10,8 +10,14 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
 import Dag from './modules/hw-app-dag';
-import logo from './logo.png';
-import './App.css';
+
+import styles from './App.module.scss';
+
+/////////////////////////
+// Components Imports
+/////////////////////////
+
+import { Header } from './components';
 
 /////////////////////////
 // View Imports
@@ -74,23 +80,6 @@ const useStyles = makeStyles({
     minWidth: 400,
   },
 });
-
-function Header() {
-  return (
-    <div className='cardHeader'>
-      <div className='leftHeader'>
-        <img src={logo} width={150} height={38} />
-      </div>
-      <div className='rightHeader'>
-        Wallet
-      </div>
-    </div>
-  );
-}
-
-function Alert(props: AlertProps) {
-  return <MuiAlert elevation={6} variant='filled' {...props} />;
-}
 
 function App() {
 
@@ -157,6 +146,10 @@ function App() {
       setOpenAlert(false)
     }
 
+    function Alert(props: AlertProps) {
+      return <MuiAlert elevation={6} variant='filled' {...props} />;
+    }
+
     return (
       <>
         <Snackbar open={props.openAlert} autoHideDuration={6000} onClose={onClose}>
@@ -198,8 +191,8 @@ function App() {
 
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div>
+      <header className={styles.appHeader}>
         <Card className={classes.root}>
           <Header />
           <RenderByWalletState walletState={walletState} />
