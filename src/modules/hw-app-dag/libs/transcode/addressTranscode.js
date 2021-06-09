@@ -1,5 +1,5 @@
 const bs58 = require('bs58');
-const Sha256Hash = require('./sha256-hash.js');
+const Sha256Hash = require('../sha256-hash.js');
 
 const DEBUG = false;
 

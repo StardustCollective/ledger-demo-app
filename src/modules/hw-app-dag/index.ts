@@ -2,8 +2,8 @@
 // Lib Imports
 //////////////////////////
 
-import LedgerLink from './libs/LedgerLink';
-import addressTranscode from './libs/addressTranscode';
+import LedgerLink from './libs/ledgerLink';
+import addressTranscode from './libs/transcode/addressTranscode';
 
 //////////////////////////
 // API Service Imports

@@ -5,11 +5,11 @@ const crypto = require('crypto');
 // const keyEncoder = new KeyEncoder('secp256k1');
 
 // modules
-const kryoUtil = require('./kryo.js');
-const hash256Util = require('./sha256-hash.js');
-const keyTranscodeUtil = require('./key-transcode.js');
-const txTranscodeUtil = require('./tx-transcode.js');
-const txHashEncodeUtil = require('./tx-hash-encode.js');
+const kryoUtil = require('../kryo.js');
+const hash256Util = require('../sha256-hash.js');
+const keyTranscodeUtil = require('../transcode/key-transcode.js');
+const txTranscodeUtil = require('../transaction/tx-transcode.js');
+const txHashEncodeUtil = require('../transaction/tx-hash-encode.js');
 
 // constants
 const DEBUG = false;
