@@ -69,13 +69,6 @@ enum WALLET_STATE_ENUM {
 }
 
 /////////////////////////
-// Interfaces
-/////////////////////////
-interface IRenderStateProp  {
-  walletState: WALLET_STATE_ENUM;
-}
-
-/////////////////////////
 // Style Hooks
 /////////////////////////
 
@@ -151,25 +144,24 @@ function App() {
     setOpenAlert(false);
   }
 
-
   /////////////////////////
   // Renders
   /////////////////////////
 
-  function RenderByWalletState(props: IRenderStateProp) {
-    if (props.walletState === WALLET_STATE_ENUM.LOCKED) {
+  function RenderByWalletState() {
+    if (walletState === WALLET_STATE_ENUM.LOCKED) {
       return (
         <>
           <ConnectView onConnectClick={onConnectClick} />
         </>
       );
-    } else if (props.walletState === WALLET_STATE_ENUM.FETCHING) {
+    } else if (walletState === WALLET_STATE_ENUM.FETCHING) {
       return (
         <>
           <FetchingProgressView accountsLoadProgress={accountsLoadProgress}/>
         </>
       );
-    } else if (props.walletState === WALLET_STATE_ENUM.VIEW_ACCOUNTS) {
+    } else if (walletState === WALLET_STATE_ENUM.VIEW_ACCOUNTS) {
       return (
         <>
           <AccountsView  accountData={accountData} />
@@ -184,7 +176,7 @@ function App() {
       <header className={styles.appHeader}>
         <Card className={classes.root}>
           <Header />
-          <RenderByWalletState walletState={walletState} />
+          <RenderByWalletState />
         </Card>
       </header>
       <AlertBar 
