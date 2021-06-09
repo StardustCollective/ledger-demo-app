@@ -38,9 +38,12 @@ import { DAG_ACCOUNT } from './interfaces';
 /////////////////////////
 
 // Strings
-const CONNECTION_CANCELED_ERROR_STRING = 'Cannot read property';
-const LEDGER_APP_CLOSED_ERROR_STRING = '6E01';
+const LEDGER_ERROR_STRINGS = {
+  CONNECTION_CANCELED: 'Cannot read property',
+  APP_CLOSED: '6E01'
+}
 const ALERT_MESSAGES_STRINGS = {
+  DEFAULT: 'Error: Please contact support',
   CONNECTION_CANCELED: 'Connection Canceled: Please connect to unlock wallet with Ledger.',
   OPEN_CONSTELLATION_APP: 'Open App: Please open the Constellation App on your Ledger',
 }
@@ -101,11 +104,13 @@ function App() {
   // Callbacks
   /////////////////////////
 
+  // Updates the state when the progress is updated.
   const onProgressUpdate = (loadProgress: number) => {
     let progress = loadProgress * 100;
     setAccountsLoadProgress(progress);
   }
 
+  // Handles the click to the Connect with Ledger Button
   const onConnectClick = async () => {
     let transport;
     try {
@@ -123,17 +128,18 @@ function App() {
       const accountData = await dag.getAccounts(onProgressUpdate) as Array<DAG_ACCOUNT>;
       setAccountData(accountData);
       setWalletState(WALLET_STATE_ENUM.VIEW_ACCOUNTS);
-
+      
     } catch (error) {;
-      if (error.message.includes(CONNECTION_CANCELED_ERROR_STRING)) {
-        setAlertSeverity(ALERT_SEVERITY_STATE.ERROR);
-        setAlertMessage(ALERT_MESSAGES_STRINGS.CONNECTION_CANCELED);
-        setOpenAlert(true);
-      } else if (error.message.includes(LEDGER_APP_CLOSED_ERROR_STRING)){
-        setAlertSeverity(ALERT_SEVERITY_STATE.ERROR);
-        setAlertMessage(ALERT_MESSAGES_STRINGS.OPEN_CONSTELLATION_APP);
-        setOpenAlert(true);
+      let errorMessage: String = ALERT_MESSAGES_STRINGS.DEFAULT;
+      let errorSeverity: String = ALERT_SEVERITY_STATE.ERROR;
+      if (error.message.includes(LEDGER_ERROR_STRINGS.CONNECTION_CANCELED)) {
+        errorMessage  = ALERT_MESSAGES_STRINGS.CONNECTION_CANCELED
+      } else if (error.message.includes(LEDGER_ERROR_STRINGS.APP_CLOSED)){
+        errorMessage = ALERT_MESSAGES_STRINGS.OPEN_CONSTELLATION_APP
       } 
+      setAlertSeverity(errorSeverity);
+      setAlertMessage(errorMessage);
+      setOpenAlert(true);
       setWalletState(WALLET_STATE_ENUM.LOCKED);
     }
 
