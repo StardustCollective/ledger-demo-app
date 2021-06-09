@@ -6,18 +6,16 @@ import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
 import { makeStyles } from '@material-ui/core/styles'
 
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
 import Dag from './modules/hw-app-dag';
 
 import styles from './App.module.scss';
 
 /////////////////////////
-// Components Imports
+// Component Imports
 /////////////////////////
 
-import { Header } from './components';
+import { Header, AlertBar } from './components';
 
 /////////////////////////
 // View Imports
@@ -97,7 +95,7 @@ function App() {
   const [accountData, setAccountData] = useState<Array<DAG_ACCOUNT>>([]);
   const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<String>('');
-  const [alertSeverity, setAlertSeverity] = useState<String>('');
+  const [alertSeverity, setAlertSeverity] = useState<undefined>('');
   const [accountsLoadProgress, setAccountsLoadProgress] = useState<number>(0);
   
   /////////////////////////
@@ -145,28 +143,10 @@ function App() {
 
   }
 
-
-  const AlertSnackBar = (props:{openAlert: boolean, message: String, severity: undefined}) => {
-
-    const onClose = () => {
-      setOpenAlert(false)
-    }
-
-    function Alert(props: AlertProps) {
-      return <MuiAlert elevation={6} variant='filled' {...props} />;
-    }
-
-    return (
-      <>
-        <Snackbar open={props.openAlert} autoHideDuration={6000} onClose={onClose}>
-          <Alert onClose={onClose} severity={props.severity}>
-            {props.message}
-          </Alert>
-        </Snackbar>
-      </>
-    );
-
+  const onAlertBarClose = () => {
+    setOpenAlert(false);
   }
+
 
   /////////////////////////
   // Renders
@@ -195,7 +175,6 @@ function App() {
     return null;
   }
 
-
   return (
     <div>
       <header className={styles.appHeader}>
@@ -204,7 +183,12 @@ function App() {
           <RenderByWalletState walletState={walletState} />
         </Card>
       </header>
-      <AlertSnackBar openAlert={openAlert} message={alertMessage} severity={alertSeverity} />
+      <AlertBar 
+        openAlert={openAlert} 
+        message={alertMessage} 
+        severity={alertSeverity} 
+        onClose={onAlertBarClose}
+      />
     </div>
   );
 }
