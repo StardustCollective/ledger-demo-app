@@ -3,18 +3,15 @@
 /////////////////////////
 
 import React, { useState } from 'react';
-import Card from '@material-ui/core/Card';
 import { makeStyles } from '@material-ui/core/styles'
-
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
 import Dag from './modules/hw-app-dag';
-
-import styles from './App.module.scss';
 
 /////////////////////////
 // Component Imports
 /////////////////////////
 
+import Card from '@material-ui/core/Card';
 import { Header, AlertBar } from './components';
 
 /////////////////////////
@@ -30,6 +27,12 @@ import AccountsView from './views/accounts';
 /////////////////////////
 
 import { DAG_ACCOUNT } from './interfaces';
+
+/////////////////////////
+// Style Imports
+/////////////////////////
+
+import styles from './App.module.scss';
 
 /////////////////////////
 // Constants
@@ -142,7 +145,8 @@ function App() {
     }
 
   }
-
+  
+  // Updates the alert bar state
   const onAlertBarClose = () => {
     setOpenAlert(false);
   }
