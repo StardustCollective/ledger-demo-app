@@ -5,7 +5,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles'
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
-import Dag from './modules/hw-app-dag';
+import Dag, {IDAG_ACCOUNT_DATA, IPUBLIC_KEY_DATA} from './modules/hw-app-dag';
 
 /////////////////////////
 // Component Imports
@@ -21,12 +21,6 @@ import { Header, AlertBar } from './components';
 import ConnectView from './views/connect';
 import FetchingProgressView from './views/fetchingProgress';
 import AccountsView from './views/accounts';
-
-/////////////////////////
-// Interface Imports
-/////////////////////////
-
-import { DAG_ACCOUNT } from './interfaces';
 
 /////////////////////////
 // Style Imports
@@ -119,7 +113,8 @@ function App() {
       // Set the transport 
       dag = new Dag(webHidTransport);
       // Get account data for ledger
-      const accountData = await dag.getAccounts(onProgressUpdate) as Array<DAG_ACCOUNT>;
+      const publicKeys = await dag.getPublicKeys(onProgressUpdate);
+      const accountData = await dag.getAccountInfoForPublicKeys(publicKeys);
       setAccountData(accountData);
       setWalletState(WALLET_STATE_ENUM.VIEW_ACCOUNTS);
       
