@@ -26,11 +26,6 @@ export interface IDAG_ACCOUNT_DATA {
   balance: string;
 }
 
-export interface IPUBLIC_KEY_DATA{
-  publicKey: string;
-  message?: string;
-}
-
 //////////////////////////
 // Constants
 //////////////////////////
@@ -62,14 +57,17 @@ class Dag {
    */
   postTransaction() {}
 
-  public async getAccountInfoForPublicKeys (progressUpdateCallback?: (progress: number) => void) {
+  /**
+   * Retrieves all accounts from the ledger and pings the DAG network for balances.
+   * @param progressUpdateCallback
+   * @returns DAG_ACCOUNT[] A array of dag account objects.
+   */
+  public async getAccountInfoForPublicKeys (ledgerAccounts: { publicKey: string}[]) {
 
-    const messagesArray = await this.ledgerLink.getPublicKeysForAllAccounts(8, progressUpdateCallback);
-
-    if (messagesArray.length > 0) {
+    if (ledgerAccounts.length > 0) {
       let responseArray = [];
-      for (let i = 0; i < messagesArray.length; i++) {
-        const publicKey = messagesArray[i].publicKey;
+      for (let i = 0; i < ledgerAccounts.length; i++) {
+        const publicKey = ledgerAccounts[i].publicKey;
         console.log('public', publicKey);
         const address = dag4.keyStore.getDagAddressFromPublicKey(publicKey);
         let response = await addressService.get(address);
@@ -91,24 +89,11 @@ class Dag {
   }
 
   /**
-   * Retrieves all accounts from the ledger and pings the DAG network for balances.
+   * Retrieves public keys from the ledger.
    * @param progressUpdateCallback
-   * @returns Array<DAG_ACCOUNT> A array of dag account objects.
    */
-  public getPublicKeys = async (progressUpdateCallback?: Function): Promise<Array<IPUBLIC_KEY_DATA>> => {
-    return new Promise((resolve, reject) => {
-      const callback = async (publicKeysArray: Array<IPUBLIC_KEY_DATA>) => {
-        if (publicKeysArray.length > 0) {
-          resolve(publicKeysArray);
-        } else {
-          reject(Error(NO_ACCOUNTS_FOUND_ERROR));
-        }
-      };
-      this.ledgerLink.getPublicKeys(
-        callback,
-        progressUpdateCallback
-      );
-    });
+  public getPublicKeys (progressUpdateCallback?: (progress: number) => void) {
+    return this.ledgerLink.getPublicKeys(8, progressUpdateCallback);
   };
 }
 

@@ -5,7 +5,7 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles'
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
-import Dag, {IDAG_ACCOUNT_DATA, IPUBLIC_KEY_DATA} from './modules/hw-app-dag';
+import Dag, {IDAG_ACCOUNT_DATA} from './modules/hw-app-dag';
 
 /////////////////////////
 // Component Imports
@@ -83,7 +83,7 @@ function App() {
 
   const classes = useStyles();
   const [walletState, setWalletState] = useState<WALLET_STATE_ENUM>(WALLET_STATE_ENUM.LOCKED);
-  const [accountData, setAccountData] = useState<DAG_ACCOUNT[]>([]);
+  const [accountData, setAccountData] = useState<IDAG_ACCOUNT_DATA[]>([]);
   const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertSeverity, setAlertSeverity] = useState<Color>('success');
