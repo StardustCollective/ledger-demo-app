@@ -6,6 +6,12 @@ import LedgerLink from './libs/ledgerLink';
 import addressTranscode from './libs/transcode/addressTranscode';
 
 //////////////////////////
+// Util Imports
+//////////////////////////
+
+import DagUtils from './utils/dag.util';
+
+//////////////////////////
 // API Service Imports
 //////////////////////////
 
@@ -40,10 +46,11 @@ class Dag {
             if(response === null){
               response = {
                 address,
-                balance: 0,
+                balance: 0.00,
               };
             }else {
               response.address = address;
+              response.balance = DagUtils.balanceToWholeNumber(response.balance, 2);
             }
             responseArray.push(response);
           }
