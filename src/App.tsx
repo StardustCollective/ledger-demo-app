@@ -33,6 +33,7 @@ import { DAG_ACCOUNT } from './interfaces';
 /////////////////////////
 
 import styles from './App.module.scss';
+import {Color} from '@material-ui/lab/Alert';
 
 /////////////////////////
 // Constants
@@ -49,11 +50,11 @@ const ALERT_MESSAGES_STRINGS = {
   OPEN_CONSTELLATION_APP: 'Open App: Please open the Constellation App on your Ledger',
 }
 // States
-const ALERT_SEVERITY_STATE = {
-  SUCCESS: 'success',
-  ERROR: 'error',
-  WARNING: 'warning',
-  INFO: 'info',
+enum ALERT_SEVERITY_STATE {
+  SUCCESS = 'success',
+  ERROR = 'error',
+  WARNING = 'warning',
+  INFO = 'info',
 }
 
 /////////////////////////
@@ -88,12 +89,12 @@ function App() {
 
   const classes = useStyles();
   const [walletState, setWalletState] = useState<WALLET_STATE_ENUM>(WALLET_STATE_ENUM.LOCKED);
-  const [accountData, setAccountData] = useState<Array<DAG_ACCOUNT>>([]);
+  const [accountData, setAccountData] = useState<DAG_ACCOUNT[]>([]);
   const [openAlert, setOpenAlert] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState<String>('');
-  const [alertSeverity, setAlertSeverity] = useState<undefined>('');
+  const [alertMessage, setAlertMessage] = useState<string>('');
+  const [alertSeverity, setAlertSeverity] = useState<Color>('success');
   const [accountsLoadProgress, setAccountsLoadProgress] = useState<number>(0);
-  
+
   /////////////////////////
   // Callbacks
   /////////////////////////
@@ -116,21 +117,21 @@ function App() {
       transport = await webHidTransport.request();
       // Close any existing connections
       transport.close()
-      // Set the transport 
+      // Set the transport
       dag = new Dag(webHidTransport);
       // Get account data for ledger
       const accountData = await dag.getAccounts(onProgressUpdate) as Array<DAG_ACCOUNT>;
       setAccountData(accountData);
       setWalletState(WALLET_STATE_ENUM.VIEW_ACCOUNTS);
-      
+
     } catch (error) {;
-      let errorMessage: String = ALERT_MESSAGES_STRINGS.DEFAULT;
-      let errorSeverity: String = ALERT_SEVERITY_STATE.ERROR;
+      let errorMessage = ALERT_MESSAGES_STRINGS.DEFAULT;
+      let errorSeverity = ALERT_SEVERITY_STATE.ERROR;
       if (error.message.includes(LEDGER_ERROR_STRINGS.CONNECTION_CANCELED)) {
         errorMessage  = ALERT_MESSAGES_STRINGS.CONNECTION_CANCELED
       } else if (error.message.includes(LEDGER_ERROR_STRINGS.APP_CLOSED)){
         errorMessage = ALERT_MESSAGES_STRINGS.OPEN_CONSTELLATION_APP
-      } 
+      }
       setAlertSeverity(errorSeverity);
       setAlertMessage(errorMessage);
       setOpenAlert(true);
@@ -138,7 +139,7 @@ function App() {
     }
 
   }
-  
+
   // Updates the alert bar state
   const onAlertBarClose = () => {
     setOpenAlert(false);
@@ -179,10 +180,10 @@ function App() {
           <RenderByWalletState />
         </Card>
       </header>
-      <AlertBar 
-        openAlert={openAlert} 
-        message={alertMessage} 
-        severity={alertSeverity} 
+      <AlertBar
+        openAlert={openAlert}
+        message={alertMessage}
+        severity={alertSeverity}
         onClose={onAlertBarClose}
       />
     </div>

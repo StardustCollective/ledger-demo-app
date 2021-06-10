@@ -2,7 +2,7 @@
 // Component Imports
 /////////////////////////
 
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import MuiAlert, {AlertProps, Color} from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 
 /////////////////////////
@@ -11,8 +11,8 @@ import Snackbar from '@material-ui/core/Snackbar';
 
 interface IAlertBar {
   openAlert: boolean,
-  message: String,
-  severity: undefined,
+  message: string,
+  severity: Color,
   onClose: Function,
 }
 

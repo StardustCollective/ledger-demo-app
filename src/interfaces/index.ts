@@ -1,1 +1,1 @@
-export { DAG_ACCOUNT } from './dagAccount';
+export type { DAG_ACCOUNT } from './dagAccount';

@@ -21,7 +21,7 @@ const ACCOUNTS = [
   '40000000',
   '30000000',
   '20000000',
-  '10000000',
+  '00000000',
 ];
 
 ////////////////////
@@ -29,8 +29,8 @@ const ACCOUNTS = [
 ////////////////////
 
 interface Message {
-  enabled: boolean; 
-  error: boolean; 
+  enabled: boolean;
+  error: boolean;
   message: String;
 }
 
@@ -50,7 +50,7 @@ class LedgerLink {
   // Constructor
   ////////////////////
 
-  constructor(transport: any){
+  constructor (transport: any) {
     this.transport = transport;
   }
 
@@ -58,49 +58,39 @@ class LedgerLink {
   // Private
   ////////////////////
 
-  private createBipPathFromAccount = (account: String) => {
-    return `8000002C80000471${account}0000000000000000`;
-  }
-  
+  private createBipPathFromAccount (index: number) {
+    console.log('createBipPathFromAccount', index);
 
-  private getLedgerInfo =  async (deviceThenCallback: Function, deviceErrorCallback: Function) => {
+    const bip44Path =
+      '8000002C' +
+      '80000471' +
+      '80000000' +
+      '00000000' +
+      `0000000${index}`;
+
+    return bip44Path;
+
+    // return `8000002C80000471${account}0000000000000000`;
+  }
+
+
+  private async getLedgerInfo () {
     const supported = await this.transport.isSupported();
     if (!supported) {
-      deviceErrorCallback(this.finishLedgerDeviceInfo({
-        enabled: false,
-        error: true,
-        message: 'Your computer does not support the ledger device.',
-      }));
-      return;
+      throw new Error('Your computer does not support the ledger device.');
     }
-    this.transport.list().then((paths: Array<String>) => {
-      if (paths.length === 0) {
-        deviceErrorCallback(this.finishLedgerDeviceInfo({
-          enabled: false,
-          error: false,
-          message: 'No USB device found.',
-        }));
-      } else {
-        const path = paths[0];
-        this.transport.open(path).then((device: any) => {
-          deviceThenCallback(device);
-        }, (error: Error) => {
-          deviceErrorCallback(error);
-        });
-      }
-    }, (error: Error) => {
-      deviceErrorCallback(error);
-    });
-  };
+    const paths: string[] = await this.transport.list();
+    if (paths.length === 0) {
+      throw new Error('No USB device found.');
+    } else {
+      return this.transport.open(paths[0]);
+    }
+  }
 
-  private finishLedgerDeviceInfo = (msg: Message ) => {
-    return msg;
-  };
-
-  private sendExchangeMessage = (bip44Path: String, device: any) => {
+  private sendExchangeMessage (bip44Path: String, device: any): Promise<LedgerMessageResponse> {
     return  new Promise((resolve, reject) => {
       const message = Buffer.from(DEVICE_ID + bip44Path, 'hex');
-      device.exchange(message).then((response: any) => {
+      device.exchange(message).then((response: Buffer) => {
         const responseStr = response.toString('hex').toUpperCase();
         let success = false;
         let message = '';
@@ -135,39 +125,41 @@ class LedgerLink {
   // Public Methods
   ///////////////////////
 
-  public getPublicKeysForAllAccounts = (callback: Function, progressUpdateCallback?: Function) => {
-    if(!this.transport){
+  public async getPublicKeysForAllAccounts (numberOfAccounts: number, progressUpdateCallback?: (progress: number) => void) {
+    if (!this.transport) {
       throw new Error('Error: A transport must be set via the constructor before calling this method');
     }
-    const deviceThenCallback = async (device: any) => {
-      let promiseArray = [];
-      try {
-        // Get the public key for each account
-        for(let i = 0; i < ACCOUNTS.length; i++){
-          const bip44Path = this.createBipPathFromAccount(ACCOUNTS[i]);
-          const result = await this.sendExchangeMessage(bip44Path, device)
-          promiseArray.push(result);
-          if(progressUpdateCallback) {
-            progressUpdateCallback((i + 1)/ACCOUNTS.length)
-          }
-        }
-        device.close();
-        callback(await Promise.all(promiseArray));
-      } catch (error) {
-        callback({
-          success: false,
-          message: error.message,
-        });
+    if (isNaN(numberOfAccounts) || numberOfAccounts < 1 || Math.floor(numberOfAccounts) !== numberOfAccounts) {
+      throw new Error('Error: Number of accounts must be an integer greater than zero');
+    }
+
+    const device = await this.getLedgerInfo();
+
+    let results = [];
+
+    // Get the public key for each account
+    for (let i = 0; i < numberOfAccounts; i++) {
+
+      const bip44Path = this.createBipPathFromAccount(i);
+      const result = await this.sendExchangeMessage(bip44Path, device)
+
+      results.push(result);
+
+      if(progressUpdateCallback) {
+        progressUpdateCallback((i+1) / numberOfAccounts)
       }
-    };
-    const deviceErrorCallback = (error: Error) => {
-      callback({
-        success: false,
-        message: error.message,
-      });
-    };
-    this.getLedgerInfo(deviceThenCallback, deviceErrorCallback);
+    }
+
+    device.close();
+
+    return results;
   };
+}
+
+type LedgerMessageResponse = {
+  success: boolean,
+  message: string,
+  publicKey: string,
 }
 
 export default LedgerLink;
