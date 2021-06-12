@@ -5,7 +5,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles'
 import webHidTransport from '@ledgerhq/hw-transport-webhid';
-import Dag, {IDAG_ACCOUNT_DATA} from './modules/hw-app-dag';
 
 /////////////////////////
 // Component Imports
@@ -28,6 +27,8 @@ import AccountsView from './views/accounts';
 
 import styles from './App.module.scss';
 import {Color} from '@material-ui/lab/Alert';
+import {dag4} from '@stardust-collective/dag4';
+import {LedgerBridge, LedgerAccount} from '@stardust-collective/dag4-ledger';
 
 /////////////////////////
 // Constants
@@ -73,9 +74,15 @@ const useStyles = makeStyles({
   },
 });
 
+dag4.di.useFetchHttpClient();
+dag4.network.config({
+    beUrl: 'https://www.stargazer.network/api/scan',
+    lbUrl: 'https://www.stargazer.network/api/node',
+  }
+);
+
 function App() {
 
-  let dag;
 
   /////////////////////////
   // Hooks
@@ -83,7 +90,7 @@ function App() {
 
   const classes = useStyles();
   const [walletState, setWalletState] = useState<WALLET_STATE_ENUM>(WALLET_STATE_ENUM.LOCKED);
-  const [accountData, setAccountData] = useState<IDAG_ACCOUNT_DATA[]>([]);
+  const [accountData, setAccountData] = useState<LedgerAccount[]>([]);
   const [openAlert, setOpenAlert] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertSeverity, setAlertSeverity] = useState<Color>('success');
@@ -112,14 +119,14 @@ function App() {
       // Close any existing connections
       transport.close()
       // Set the transport
-      dag = new Dag(webHidTransport);
+      const ledgerBridge = new LedgerBridge(webHidTransport);
       // Get account data for ledger
-      const publicKeys = await dag.getPublicKeys(onProgressUpdate);
-      const accountData = await dag.getAccountInfoForPublicKeys(publicKeys);
-      setAccountData(accountData);
+      const publicKeys = await ledgerBridge.getPublicKeys(2, onProgressUpdate);
+      const accountData = await ledgerBridge.getAccountInfoForPublicKeys(publicKeys);
+      setAccountData(accountData.map(d => ({ ...d, balance: d.balance.toFixed(2) })));
       setWalletState(WALLET_STATE_ENUM.VIEW_ACCOUNTS);
 
-    } catch (error) {;
+    } catch (error) {
       let errorMessage = ALERT_MESSAGES_STRINGS.DEFAULT;
       let errorSeverity = ALERT_SEVERITY_STATE.ERROR;
       if (error.message.includes(LEDGER_ERROR_STRINGS.CONNECTION_CANCELED)) {
@@ -133,6 +140,16 @@ function App() {
       setWalletState(WALLET_STATE_ENUM.LOCKED);
     }
 
+  }
+
+  const onTxClick = (index: number = 0) => {
+    console.log('clicked', index);
+
+    const ledgerBridge = new LedgerBridge(webHidTransport);
+    const lastAccount = accountData[accountData.length-1];
+    const { address, publicKey } = accountData[index];
+
+    // dag.buildTx(publicKey, address, lastAccount.address);
   }
 
   // Updates the alert bar state
@@ -160,7 +177,7 @@ function App() {
     } else if (walletState === WALLET_STATE_ENUM.VIEW_ACCOUNTS) {
       return (
         <>
-          <AccountsView  accountData={accountData} />
+          <AccountsView  onTxClick={onTxClick}  accountData={accountData} />
         </>
       );
     }
