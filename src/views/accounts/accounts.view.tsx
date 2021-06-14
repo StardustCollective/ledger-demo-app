@@ -15,7 +15,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {IDAG_ACCOUNT_DATA} from '../../modules/hw-app-dag';
+import React from 'react';
+import {LedgerAccount} from '@stardust-collective/dag4-ledger';
 
 /////////////////////////
 // Styles
@@ -31,7 +32,8 @@ const useStyles = makeStyles({
 // Interfaces
 /////////////////////////
 interface IAccountsProps {
-  accountData: Array<IDAG_ACCOUNT_DATA>;
+  onTxClick: (index: number) => void;
+  accountData: LedgerAccount[];
 }
 
 /////////////////////////
@@ -55,6 +57,14 @@ let Accounts = (props: IAccountsProps) => {
   let {
     accountData
   } = props;
+
+  const onGenerateClick = (index: number) => {
+
+    if(props.onTxClick){
+      props.onTxClick(index);
+    }
+
+  };
 
   /////////////////////////
   // Hooks
@@ -85,7 +95,7 @@ let Accounts = (props: IAccountsProps) => {
               </TableCell>
               <TableCell align="left">{item.address}</TableCell>
               <TableCell align="left">{item.balance}</TableCell>
-              <TableCell align="left">{GENERATE_TRANSACTION_LINK_STRING}</TableCell>
+              <TableCell align="left"><button onClick={() => onGenerateClick(itemKey)} >{GENERATE_TRANSACTION_LINK_STRING}</button></TableCell>
             </TableRow>
           ))}
         </TableBody>
