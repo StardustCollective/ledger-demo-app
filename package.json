@@ -19,6 +19,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "bs58": "^4.0.1",
+    "clsx": "^1.1.1",
     "fast-stream-to-buffer": "^1.0.0",
     "get-stream": "^6.0.1",
     "node-sass": "^5.0.0",

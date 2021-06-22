@@ -2,31 +2,23 @@
 // Module Imports
 /////////////////////////
 
-import { makeStyles } from '@material-ui/core/styles'
+import styles from "./index.module.scss";
+import CallMadeIcon from "@material-ui/icons/CallMade";
+import { Checkbox } from "@material-ui/core";
 
 /////////////////////////
 // Components Imports
 /////////////////////////
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import React from 'react';
-import {LedgerAccount} from '@stardust-collective/dag4-ledger';
+import TableContainer from "@material-ui/core/TableContainer";
+import Paper from "@material-ui/core/Paper";
+import React from "react";
+import { LedgerAccount } from "@stardust-collective/dag4-ledger";
+import { ellipsis } from "../../helper";
 
 /////////////////////////
 // Styles
 /////////////////////////
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
 
 /////////////////////////
 // Interfaces
@@ -41,67 +33,63 @@ interface IAccountsProps {
 /////////////////////////
 
 // Strings
-const TABLE_HEADER_STRINGS = {
-  ACCOUNT: 'Account',
-  ADDRESS: 'Address',
-  BALANCE: 'Balance',
-};
-const GENERATE_TRANSACTION_LINK_STRING = 'Generate Transaction'
+// const TABLE_HEADER_STRINGS = {
+//   ACCOUNT: "Account",
+//   ADDRESS: "Address",
+//   BALANCE: "Balance",
+// };
+// const GENERATE_TRANSACTION_LINK_STRING = "Generate Transaction";
 
 /////////////////////////
 // View
 /////////////////////////
 
 let Accounts = (props: IAccountsProps) => {
-
-  let {
-    accountData
-  } = props;
+  let { accountData } = props;
 
   const onGenerateClick = (index: number) => {
-
-    if(props.onTxClick){
+    if (props.onTxClick) {
       props.onTxClick(index);
     }
-
   };
-
-  /////////////////////////
-  // Hooks
-  /////////////////////////
-
-  const classes = useStyles();
 
   /////////////////////////
   // Render
   /////////////////////////
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>{TABLE_HEADER_STRINGS.ACCOUNT}</TableCell>
-            <TableCell align='left'>{TABLE_HEADER_STRINGS.ADDRESS}</TableCell>
-            <TableCell align="left">{TABLE_HEADER_STRINGS.BALANCE}</TableCell>
-            <TableCell align="left"></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {accountData.map((item, itemKey) => (
-            <TableRow key={itemKey}>
-              <TableCell component="th" scope="row">
-                {itemKey + 1}
-              </TableCell>
-              <TableCell align="left">{item.address}</TableCell>
-              <TableCell align="left">{item.balance}</TableCell>
-              <TableCell align="left"><button onClick={() => onGenerateClick(itemKey)} >{GENERATE_TRANSACTION_LINK_STRING}</button></TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <TableContainer component={Paper} className={styles.paper}>
+      <span>Please select an account:</span>
+      <div className={styles.walletList}>
+        <div className={styles.wallet}>
+          <table>
+            <tbody>
+              {accountData.map((item, itemKey) => (
+                <tr key={`wallet-${itemKey}`}>
+                  <td>
+                    <Checkbox color="primary" />
+                  </td>
+                  <td>{itemKey + 1}</td>
+                  <td>{ellipsis(item.address)}</td>
+                  <td>{item.balance} DAG</td>
+                  <td
+                    className={styles.expand}
+                    onClick={() => onGenerateClick(itemKey)}
+                  >
+                    <CallMadeIcon />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className={styles.pagination}>
+        <span className={styles.previous}>Previous</span>
+        <span>Next</span>
+      </div>
     </TableContainer>
   );
-}
+};
 
 export default Accounts;
